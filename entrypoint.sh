@@ -1,19 +1,21 @@
 #!/bin/sh
 set -e
 
-if [ ! -f "$SSH_KEY" ]; then
+if [[ ! -e "/ssh/id_rsa" ]];then
+ if [ ! -f "$SSH_KEY" ]; then
   echo "SSH key file not found at: $SSH_KEY"
   exit 1
+ fi
+ # Copy the ssh key to a non-root directory
+ mkdir -p /ssh
+ cp "$SSH_KEY" /ssh/id_rsa
+ chmod 400 /ssh/id_rsa
 fi
+
 if [ $MODE -ne "REMOTE" ] && [ $MODE -ne "LOCAL" ]; then
   echo "Environment variable MODE is not corretly set. Possible values: 'REMOTE', 'LOCAL'."
   exit 1
 fi
-
-# Copy the ssh key to a non-root directory
-mkdir -p /ssh
-cp "$SSH_KEY" /ssh/id_rsa
-chmod 400 /ssh/id_rsa
 
 # Add logs for connection attempts
 echo "Attempting to connect to $SSH_HOST at $(date)"
